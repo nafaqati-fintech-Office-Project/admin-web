@@ -5,9 +5,9 @@ import { Async, Card, NotAvailable, Page, PrivacyNote, Stat, useLoad } from '../
 
 const n = (v) => (v == null ? null : v.toLocaleString())
 
-function Breakdown({ title, rows }) {
+function Breakdown({ title, rows, to }) {
   return (
-    <Card title={title}>
+    <Card title={title} to={to}>
       {rows.length === 0 ? <NotAvailable /> : (
         <ul className="breakdown">
           {rows.map((r) => (
@@ -40,9 +40,9 @@ export default function Overview() {
         {(d) => (
           <>
             <div className="grid stats">
-              <Stat label="Registered accounts" value={n(d.totals.users)} delta={d.deltas.users} />
-              <Stat label="Active accounts (30d)" value={n(d.totals.activeUsers30d)} delta={d.deltas.activeUsers30d} />
-              <Stat label="Premium subscribers" value={n(d.totals.premium)} delta={d.deltas.premium} />
+              <Stat label="Registered accounts" value={n(d.totals.users)} delta={d.deltas.users} to="/users" />
+              <Stat label="Active accounts (30d)" value={n(d.totals.activeUsers30d)} delta={d.deltas.activeUsers30d} to="/users" />
+              <Stat label="Premium subscribers" value={n(d.totals.premium)} delta={d.deltas.premium} to="/billing" />
               <Stat label="Families" value={n(d.totals.families)} delta={d.deltas.families} />
             </div>
             <div className="grid two">
@@ -50,7 +50,7 @@ export default function Overview() {
               <Card title="Daily active accounts"><TimeChart data={d.dailyActive} color="var(--accent)" /></Card>
             </div>
             <div className="grid three">
-              <Breakdown title="Plans" rows={d.planBreakdown} />
+              <Breakdown title="Plans" rows={d.planBreakdown} to="/billing" />
               <Breakdown title="Platforms" rows={d.platformBreakdown} />
               <Breakdown title="Feature adoption (accounts)" rows={d.featureAdoption} />
             </div>

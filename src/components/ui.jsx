@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ShieldCheck } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ChevronRight, ShieldCheck } from 'lucide-react'
 
 /** Loads data once and exposes reload. */
 export function useLoad(fn) {
@@ -38,7 +39,16 @@ export function Async({ state, children }) {
   return children(state.data)
 }
 
-export function Card({ title, children, className = '' }) {
+/** A card; with `to` the whole card opens that page (same drill-down as the nafaqati-web dashboard tiles). */
+export function Card({ title, children, className = '', to, label }) {
+  if (to) {
+    return (
+      <Link to={to} className={`card card-clickable ${className}`} aria-label={label ?? `Open ${title}`} title={label ?? `Open ${title}`}>
+        {title && <h3>{title} <ChevronRight size={14} aria-hidden="true" /></h3>}
+        {children}
+      </Link>
+    )
+  }
   return (
     <div className={`card ${className}`}>
       {title && <h3>{title}</h3>}
@@ -47,16 +57,21 @@ export function Card({ title, children, className = '' }) {
   )
 }
 
-export function Stat({ label, value, delta }) {
+/** A stat tile. With `to` (and a value to show) it opens the page behind the number. */
+export function Stat({ label, value, delta, to }) {
   const missing = value == null || value === 'null'
-  return (
-    <div className="card stat">
+  const body = (
+    <>
       <span className="muted">{label}</span>
       <strong>{missing ? '—' : value}</strong>
       {missing && <span className="muted">Not connected yet</span>}
       {!missing && delta != null && <span className={delta >= 0 ? 'pos' : 'neg'}>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}% vs previous 30 days</span>}
-    </div>
+    </>
   )
+  if (to && !missing) {
+    return <Link to={to} className="card stat card-clickable" aria-label={`${label}: open details`} title={`Open ${label}`}>{body}</Link>
+  }
+  return <div className="card stat">{body}</div>
 }
 
 const TONES = {
