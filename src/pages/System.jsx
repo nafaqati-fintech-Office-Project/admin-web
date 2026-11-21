@@ -9,7 +9,8 @@ export default function System() {
   const caps = useLoad(getCapabilities)
 
   const toggle = async (f) => {
-    if (!window.confirm(`${f.enabled ? 'Disable' : 'Enable'} "${f.key}"?`)) return
+    const effect = f.enforcedBy ? `${f.enforcedBy} picks this up within 30 seconds.` : 'No service reads this flag yet, so nothing changes in the apps.'
+    if (!window.confirm(`${f.enabled ? 'Disable' : 'Enable'} "${f.key}"? ${effect}`)) return
     await setFlag(f.key, !f.enabled)
     flags.reload()
   }
@@ -30,17 +31,18 @@ export default function System() {
       </Async>
       <h2>Kafka consumer lag</h2>
       <Async state={kafka}>
-        {(rows) => rows.length === 0 ? <NotAvailable>Consumer lag is not exposed by the services yet.</NotAvailable> : <Table columns={[{ key: 'topic', label: 'Topic' }, { key: 'consumerGroup', label: 'Consumer' }, { key: 'lag', label: 'Lag (messages)', render: (r) => <span className={r.lag > 100 ? 'neg' : ''}>{r.lag}</span> }]} rows={rows.map((r, i) => ({ ...r, id: i }))} />}
+        {(rows) => rows.length === 0 ? <NotAvailable>No consumer group has committed offsets yet.</NotAvailable> : <Table columns={[{ key: 'topic', label: 'Topic' }, { key: 'consumerGroup', label: 'Consumer' }, { key: 'lag', label: 'Lag (messages)', render: (r) => <span className={r.lag > 100 ? 'neg' : ''}>{r.lag}</span> }]} rows={rows.map((r, i) => ({ ...r, id: i }))} />}
       </Async>
       <h2>Feature flags</h2>
       {caps.data && !caps.data.featureFlagsEnforced && <Notice>These flags are stored and audited here, but the services do not read them yet, so changing one does not change app behaviour.</Notice>}
+      <p className="muted small">If admin-service cannot be reached, the services keep the last value they read, and treat a flag as on until they have read it once.</p>
       <Async state={flags}>
         {(rows) => (
           <Card>
             <ul className="flags">
               {rows.map((f) => (
                 <li key={f.key}>
-                  <div><code>{f.key}</code><div className="muted small">{f.summary}</div></div>
+                  <div><code>{f.key}</code><div className="muted small">{f.summary}</div><div className="small flag-note">{f.enforcedBy ? <span className="pos">Enforced by {f.enforcedBy}</span> : <span className="muted">Stored only: no service reads it yet</span>}</div></div>
                   <button className={`toggle ${f.enabled ? 'on' : ''}`} role="switch" aria-checked={f.enabled} onClick={() => toggle(f)}><span /></button>
                 </li>
               ))}

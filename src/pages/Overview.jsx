@@ -47,7 +47,7 @@ export default function Overview() {
             </div>
             <div className="grid two">
               <Card title="New sign-ups per day"><TimeChart data={d.signups} color="var(--brand)" /></Card>
-              <Card title="Daily active accounts"><TimeChart data={d.dailyActive} color="var(--accent)" /></Card>
+              <Card title={d.totals.activeUsers1d != null ? `Daily active accounts (today ${n(d.totals.activeUsers1d)}, 7 days ${n(d.totals.activeUsers7d)})` : 'Daily active accounts'}><TimeChart data={d.dailyActive} color="var(--accent)" /></Card>
             </div>
             <div className="grid three">
               <Breakdown title="Plans" rows={d.planBreakdown} to="/billing" />

@@ -26,7 +26,7 @@ Sessions: access token in memory only, refresh token in `sessionStorage`, 15 min
 
 ## Data source
 
-`VITE_USE_MOCKS=true` (default) uses fixtures in `src/mocks/data.js`, because admin-service (port 8088) is not built yet.
+`VITE_USE_MOCKS=false` talks to admin-service (port 8088) through the gateway; `true` uses fixtures in `src/mocks/data.js` with the same shapes, for UI work without the stack. Endpoints and rules: `docs/admin-service.md`.
 The three request actions already exist in user-service:
 
 - `POST /api/admin/email-change-requests/{id}/confirm`
@@ -37,7 +37,7 @@ Endpoints the panel expects from admin-service (all `ROLE_ADMIN`, all privacy-sa
 | Endpoint | Returns |
 |---|---|
 | `GET /api/admin/stats/overview`, `/stats/billing` | aggregates and time series |
-| `GET /api/admin/users`, `POST /users/{id}/status`, `/users/{id}/force-logout` | `id`, `emailMasked`, `status`, `plan`, `inFamily`, `authProvider`, dates |
+| `GET /api/admin/users`, `POST /users/{id}/status`, `/force-logout`, `/delete`, `/subscription/end` | page of `id`, `status`, `suspended`, `plan`, `authProvider`, dates; actions are audited |
 | `GET /api/admin/email-change-requests`, `/deletion-requests` | request state with `userRef` and masked emails |
 | `GET /api/admin/system/health`, `/system/kafka`, `/feature-flags` | service status, lag, flags |
 | `GET/POST /api/admin/broadcasts` | segment-level announcements (no per-person targeting) |

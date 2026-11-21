@@ -8,7 +8,24 @@ export const users = Array.from({ length: 42 }, (_, i) => ({
   id: hex(i),
   status: i % 9 === 4 ? 'PENDING_DELETION' : 'ACTIVE',
   createdAt: iso(i * 2 + 1),
+  suspended: i === 7,
+  authProvider: i % 3 === 0 ? 'GOOGLE' : 'PASSWORD',
+  emailMasked: `${'akmsz'[i % 5]}***@${'goy'[i % 3]}***.com`,
+  admin: false,
+  plan: i % 4 === 1 ? 'PREMIUM' : 'FREE',
+  subscriptionStatus: i % 4 === 1 ? 'ACTIVE' : null,
+  cancelAtPeriodEnd: i === 5,
+  periodEnd: i % 4 === 1 ? iso(-20) : null,
 }))
+
+/** POST /api/admin/users/lookup: any full address finds the first account in mock mode. */
+export const lookup = () => users[2]
+
+/** Same shape as GET /api/admin/users. */
+export const usersPage = ({ page, size, ref, status }) => {
+  const rows = users.filter((u) => (status === 'ALL' || u.status === status) && (!ref || u.id.startsWith(ref)))
+  return { items: rows.slice(page * size, (page + 1) * size), total: rows.length, page, size, sources: { auth: true, billing: true } }
+}
 
 const ref = (i) => users[i].id.slice(0, 8)
 
@@ -33,10 +50,10 @@ const series = (n, base, amp) =>
   }))
 
 export const overview = {
-  totals: { users: 12840, activeUsers30d: null, premium: 1184, families: null },
-  deltas: { users: 4.2, activeUsers30d: null, premium: null, families: null },
+  totals: { users: 12840, activeUsers30d: 7310, activeUsers7d: 4120, activeUsers1d: 1630, premium: 1184, families: 402 },
+  deltas: { users: 4.2, activeUsers30d: 2.1, premium: null, families: 6.5 },
   signups: series(30, 60, 18),
-  dailyActive: [],
+  dailyActive: series(30, 1500, 140),
   planBreakdown: [{ label: 'Free', count: 11656 }, { label: 'Premium', count: 1184 }],
   platformBreakdown: [],
   featureAdoption: [],
@@ -52,11 +69,14 @@ export const billing = {
 }
 
 export const capabilities = {
-  accountStatus: false,
-  forceLogout: false,
-  kafkaLag: false,
-  broadcastDelivery: false,
-  featureFlagsEnforced: false,
+  accountStatus: true,
+  forceLogout: true,
+  deleteAccount: true,
+  endSubscription: true,
+  changePlan: true,
+  kafkaLag: true,
+  broadcastDelivery: true,
+  featureFlagsEnforced: true,
 }
 
 const svc = (service, port, up = true, ms = 20) => ({ service, port, status: up ? 'UP' : 'DOWN', latencyMs: up ? ms : null })
@@ -75,16 +95,20 @@ export const health = [
   svc('billing-service', 8093, true, 25),
 ]
 
-export const kafka = []
+export const kafka = [
+  { topic: 'user-deleted', consumerGroup: 'auth-service', lag: 0 },
+  { topic: 'user-registered', consumerGroup: 'user-service', lag: 2 },
+  { topic: 'transaction-events', consumerGroup: 'budget-service', lag: 140 },
+]
 
 export const featureFlags = [
-  { key: 'family-premium-enforcement', summary: 'Enforce Premium for Family features', enabled: false },
-  { key: 'sms-import', summary: 'SMS transaction import', enabled: true },
-  { key: 'paymob-checkout', summary: 'Paymob checkout in the apps', enabled: true },
+  { key: 'family-premium-enforcement', summary: 'Enforce Premium for Family features', enabled: false, enforcedBy: null },
+  { key: 'paymob-checkout', summary: 'Paymob checkout in the apps', enabled: true, enforcedBy: 'billing-service' },
+  { key: 'sms-import', summary: 'SMS transaction import', enabled: true, enforcedBy: 'billing-service' },
 ]
 
 export const broadcasts = [
-  { id: 'bc-1', title: 'Welcome to Family budgets', audience: 'All users', channel: 'PUSH', status: 'QUEUED', sentAt: iso(6), reach: 0 },
+  { id: 'bc-1', title: 'Welcome to Family budgets', audience: 'All users', channel: 'PUSH', status: 'SENT', sentAt: iso(6), reach: 12210, failed: 0 },
 ]
 
 export const auditLog = [

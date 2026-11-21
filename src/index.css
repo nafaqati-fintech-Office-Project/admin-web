@@ -149,3 +149,29 @@ a.card-clickable:focus-visible { outline: 2px solid var(--primary); outline-offs
 a.card-clickable h3 { display: flex; align-items: center; gap: 4px; }
 a.card-clickable h3 svg { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { a.card-clickable:hover { transform: none; } }
+
+/* Account actions: the Manage dialog */
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #dc2626; }
+.row-actions.start { justify-content: flex-start; flex-wrap: wrap; }
+.plan-cell { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.notice.ok { background: #ecfdf3; border-color: #bbf7d0; color: #166534; }
+.icon-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; border: 0; background: transparent; color: var(--muted); }
+.icon-btn:hover:not(:disabled) { background: #f1f5f9; color: var(--navy); }
+.modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(15, 27, 61, 0.45); display: grid; place-items: center; padding: 16px; }
+.modal { width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--card); border-radius: 16px; box-shadow: 0 20px 60px rgba(15, 27, 61, 0.25); padding: 20px 22px; }
+.modal > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.modal > header h2 { margin: 0; }
+.modal section { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 14px; }
+.modal section h3 { margin-bottom: 4px; }
+.modal section p { margin-bottom: 10px; }
+.modal .danger-zone h3 { color: var(--danger); }
+.confirm-label { display: grid; gap: 6px; font-size: 13px; margin-bottom: 10px; }
+.confirm-label input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+.flag-note { margin-top: 2px; }
+
+/* Support lookup */
+.find-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.find-form input { flex: 1 1 260px; min-width: 0; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+.find-error { margin: 0 0 8px; }
+.masked-email { margin-left: 10px; font-size: 13px; font-weight: 600; color: var(--muted); }

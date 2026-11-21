@@ -20,7 +20,7 @@ export default function Notifications() {
     try {
       await sendBroadcast(form)
       setForm({ ...form, title: '', body: '' })
-      setMsg('Broadcast recorded.')
+      setMsg('Broadcast queued for delivery.')
       state.reload()
     } catch {
       setMsg('Could not send the broadcast.')
@@ -35,25 +35,27 @@ export default function Notifications() {
     { key: 'channel', label: 'Channel' },
     { key: 'status', label: 'Status', render: (r) => <Badge value={r.status} /> },
     { key: 'sentAt', label: 'Sent', render: (r) => fmtDate(r.sentAt) },
-    { key: 'reach', label: 'Reach', render: (r) => (r.reach ? r.reach.toLocaleString() : '—') },
+    { key: 'reach', label: 'Reached', render: (r) => (r.reach ? r.reach.toLocaleString() : '—') },
+    { key: 'failed', label: 'Failed', render: (r) => (r.failed ? <span className="neg">{r.failed.toLocaleString()}</span> : '—') },
   ]
 
   return (
     <Page title="Broadcasts" subtitle="Announcements to whole segments. Targeting a single person is deliberately not possible.">
       <PrivacyNote>Audiences are broad segments, never individuals, and never based on financial behaviour.</PrivacyNote>
-      {caps.data && !caps.data.broadcastDelivery && <Notice>Delivery through notification-service is not connected yet: broadcasts are recorded and audited but stay QUEUED.</Notice>}
+      {caps.data && !caps.data.broadcastDelivery && <Notice>Delivery through notification-service is not connected: broadcasts are recorded and audited but stay QUEUED.</Notice>}
+      {caps.data?.broadcastDelivery && <p className="muted small">Each broadcast is delivered as an in-app notification and pushed to the phones of everyone in the segment. Delivery runs in the background; refresh to see its result.</p>}
       <Card title="New broadcast">
         <form className="form" onSubmit={submit}>
           <label>Title<input maxLength={80} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
-          <label>Message<textarea rows={3} maxLength={300} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} required /></label>
+          <label>Message<textarea rows={3} maxLength={200} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} required /></label>
           <div className="form-row">
             <label>Audience<select value={form.audience} onChange={(e) => setForm({ ...form, audience: e.target.value })}>{AUDIENCES.map((a) => <option key={a}>{a}</option>)}</select></label>
-            <label>Channel<select value={form.channel} onChange={(e) => setForm({ ...form, channel: e.target.value })}><option value="PUSH">Push</option><option value="IN_APP">In-app</option><option value="EMAIL">Email</option></select></label>
+            <label>Channel<select value="PUSH" disabled aria-describedby="channel-note"><option value="PUSH">In-app + push</option></select><span id="channel-note" className="muted small">Every notification is also pushed to the person's phones. E-mail is not offered.</span></label>
           </div>
           <div className="form-row"><button className="btn btn-primary" disabled={sending}>{sending ? 'Sending…' : 'Send broadcast'}</button>{msg && <span className="muted">{msg}</span>}</div>
         </form>
       </Card>
-      <h2>History</h2>
+      <div className="form-row"><h2>History</h2><button className="btn small btn-outline" onClick={state.reload}>Refresh</button></div>
       <Async state={state}>{(rows) => <Table columns={columns} rows={rows} />}</Async>
     </Page>
   )

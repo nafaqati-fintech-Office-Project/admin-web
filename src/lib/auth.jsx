@@ -8,7 +8,7 @@ const AuthContext = createContext(null)
 export const useAuth = () => useContext(AuthContext)
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null) // { role } only: never the person's name or email
+  const [session, setSession] = useState(null) // { role, id } only: the admin's own pseudonymous id, never a name or email
 
   const login = useCallback(async (identifier, password) => {
     if (USE_MOCKS) {
@@ -16,14 +16,16 @@ export function AuthProvider({ children }) {
       return
     }
     const { data } = await bare.post('/api/auth/login', { identifier, password, rememberMe: false })
-    if (!hasAdminRole(decodeClaims(data.accessToken))) {
+    const claims = decodeClaims(data.accessToken)
+    if (!hasAdminRole(claims)) {
       const err = new Error('This account is not an administrator.')
       err.code = 'NOT_ADMIN'
       throw err
     }
     setAccessToken(data.accessToken)
     writeRefresh(data.refreshToken)
-    setSession({ role: 'ADMIN' })
+    // id: lets the panel hide actions on the admin's own account (the server refuses them anyway)
+    setSession({ role: 'ADMIN', id: typeof claims.userId === 'string' ? claims.userId : null })
   }, [])
 
   const logout = useCallback(async () => {
