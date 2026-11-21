@@ -103,7 +103,7 @@ td { padding: 12px 16px; border-top: 1px solid var(--line); color: var(--navy); 
 
 .state { padding: 40px; text-align: center; color: var(--muted); } .state.error { color: var(--danger); }
 .form { display: flex; flex-direction: column; gap: 14px; max-width: 620px; }
-.form label, .login-card label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 13px; color: var(--navy); flex: 1; }
+.form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 13px; color: var(--navy); flex: 1; }
 .form-row { display: flex; gap: 12px; align-items: center; }
 .form-error { color: #dc2626; background: #fee2e2; padding: 9px 14px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; }
 .toggle { width: 42px; height: 24px; border-radius: 999px; border: 0; background: #cbd5e1; position: relative; }
@@ -111,10 +111,6 @@ td { padding: 12px 16px; border-top: 1px solid var(--line); color: var(--navy); 
 .toggle.on { background: linear-gradient(135deg, var(--primary), var(--purple)); } .toggle.on span { transform: translateX(18px); }
 
 /* Login */
-.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; background: linear-gradient(160deg, #eaf1ff 0%, #f1f5fd 55%, #efe8ff 100%); }
-.login-card { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; padding: 32px; border-radius: 20px; }
-.login-card p { margin-top: -8px; }
-.login-icon { width: 52px; height: 52px; }
 
 /* Tablet: icon-only sidebar, like nafaqati-web */
 @media (min-width: 1024px) and (max-width: 1279px) {
