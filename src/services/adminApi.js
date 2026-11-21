@@ -11,7 +11,12 @@ const post = async (path, body, mock) =>
   sanitize(USE_MOCKS ? await wait(mock ?? { ok: true }) : (await http.post(path, body)).data)
 
 // ---- What this deployment can do yet (admin-service) ----
-export const getCapabilities = () => get('/api/admin/capabilities', m.capabilities)
+// Fetched once per page load and reused by every screen (it only changes when admin-service is redeployed).
+let capabilities = null
+export const getCapabilities = () => {
+  if (!capabilities) capabilities = get('/api/admin/capabilities', m.capabilities).catch((e) => { capabilities = null; throw e })
+  return capabilities
+}
 
 // ---- Aggregates (admin-service) ----
 export const getOverview = () => get('/api/admin/stats/overview', m.overview)
